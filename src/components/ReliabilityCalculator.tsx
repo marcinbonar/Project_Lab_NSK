@@ -44,7 +44,7 @@ export default function ReliabilityCalculator() {
 
     const calculateDensity = (t: number): number => {
         const exactFailuresAtT = times.filter((time) => time <= t).length;
-        return exactFailuresAtT / (times.length * exactFailuresAtT || 1); // Zapobiega dzieleniu przez 0
+        return exactFailuresAtT / (times.length * exactFailuresAtT || 1);
     };
 
     const calculateLambda = (t: number): number => {
@@ -116,7 +116,7 @@ export default function ReliabilityCalculator() {
     };
 
     return (
-        <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg m-2">
+        <div className="container mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-lg m-2 max-w-2xl">
             <h1 className="text-2xl font-bold mb-6 text-center">Obliczanie empirycznych wskaźników niezawodności</h1>
 
             <div className="mb-4">
@@ -127,7 +127,10 @@ export default function ReliabilityCalculator() {
                     placeholder="Wprowadź czas do awarii"
                     className="border border-gray-400 p-2 rounded-md w-full"
                 />
-                <button onClick={handleAddTime} className="bg-blue-500 text-white p-2 rounded-md mt-2 w-full">
+                <button
+                    onClick={handleAddTime}
+                    className="bg-blue-500 text-white p-2 rounded-md mt-2 w-full hover:bg-blue-600"
+                >
                     Dodaj
                 </button>
                 {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
@@ -137,7 +140,7 @@ export default function ReliabilityCalculator() {
                 <h2 className="text-xl font-semibold p-2">Wprowadzone czasy do awarii:</h2>
                 <div className="flex flex-wrap gap-2">
                     {times.map((time, index) => (
-                        <div key={index} className="relative bg-gray-200 p-2 rounded-md shadow">
+                        <div key={index} className="relative bg-gray-200 p-2 rounded-md shadow w-24">
                             <button
                                 onClick={() => handleRemoveTime(index)}
                                 className="absolute top-[-8px] left-[-8px] bg-red-500 text-white rounded-full p-1 text-xs w-4 h-4 flex items-center justify-center"
@@ -153,21 +156,27 @@ export default function ReliabilityCalculator() {
 
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">Oblicz wskaźniki dla danego t</h2>
-                <p>
-                    Wprowadź t: <input type="number" value={tValue} onChange={(e) => setTValue(e.target.value)} placeholder="Wartość t" className="border border-gray-400 p-2 rounded-md" />
+                <div className="flex flex-col sm:flex-row items-center">
+                    <input
+                        type="number"
+                        value={tValue}
+                        onChange={(e) => setTValue(e.target.value)}
+                        placeholder="Wartość t"
+                        className="border border-gray-400 p-2 rounded-md mb-2 sm:mb-0 sm:mr-2 flex-grow"
+                    />
                     <button
                         onClick={handleCalculate}
-                        className="bg-green-500 text-white p-2 rounded-md ml-2"
+                        className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
                     >
                         Oblicz wskaźniki
                     </button>
-                </p>
+                </div>
                 {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
 
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">Wzory obliczeń:</h2>
-                <ul className="list-disc list-inside">
+                <ul className="list-disc list-inside text-sm sm:text-base">
                     <li>
                         <b>F*(t)</b>: Prawdopodobieństwo awarii przed czasem t. {"F*(t) = P(T < t)"}
                     </li>
@@ -188,7 +197,7 @@ export default function ReliabilityCalculator() {
 
             {isModalOpen && calculatedResults && (
                 <div className="fixed z-10 inset-0 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 relative z-20">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-1/2 relative z-20">
                         <h2 className="text-2xl font-bold mb-4">Wyniki obliczeń</h2>
                         <p><b>F*(t)</b>: {calculatedResults.F}</p>
                         <p><b>R*(t)</b>: {calculatedResults.R}</p>
@@ -197,13 +206,13 @@ export default function ReliabilityCalculator() {
                         <p><b>E*T</b>: {calculateMeanTime().toFixed(2)} godzin</p>
                         <button
                             onClick={exportToTextFile}
-                            className="bg-green-500 text-white p-2 rounded-md mt-4 m-2"
+                            className="bg-green-500 text-white p-2 rounded-md mt-4 m-2 hover:bg-green-600"
                         >
                             Pobierz plik tekstowy
                         </button>
                         <button
                             onClick={closeModal}
-                            className="mt-4 bg-blue-500 text-white p-2 rounded-md"
+                            className="mt-4 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
                         >
                             Zamknij
                         </button>
@@ -213,7 +222,10 @@ export default function ReliabilityCalculator() {
             )}
 
             <div className="mb-6">
-                <button onClick={resetAll} className="bg-red-500 text-white p-2 rounded-md w-full">
+                <button
+                    onClick={resetAll}
+                    className="bg-red-500 text-white p-2 rounded-md w-full hover:bg-red-600"
+                >
                     Resetuj
                 </button>
             </div>
