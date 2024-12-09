@@ -1,6 +1,13 @@
 "use client";
 import { useState } from "react";
 
+type CalculatedResults = {
+    F: string;
+    R: string;
+    f: string;
+    lambda: string;
+};
+
 export default function ReliabilityCalculator() {
     const [times, setTimes] = useState<number[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
@@ -8,7 +15,7 @@ export default function ReliabilityCalculator() {
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [calculatedResults, setCalculatedResults] = useState<any>(null);
+    const [calculatedResults, setCalculatedResults] = useState<CalculatedResults | null>(null);
 
     const handleAddTime = () => {
         const time = parseFloat(inputValue);
@@ -26,27 +33,27 @@ export default function ReliabilityCalculator() {
         setTimes((prevTimes) => prevTimes.filter((_, i) => i !== index));
     };
 
-    const calculateF = (t: number) => {
-        const failuresBeforeT = times.filter(time => time < t).length;
+    const calculateF = (t: number): number => {
+        const failuresBeforeT = times.filter((time) => time < t).length;
         return failuresBeforeT / times.length;
     };
 
-    const calculateR = (t: number) => {
+    const calculateR = (t: number): number => {
         return 1 - calculateF(t);
     };
 
-    const calculateDensity = (t: number) => {
-        const exactFailuresAtT = times.filter(time => time <= t).length;
-        return exactFailuresAtT / (times.length * exactFailuresAtT);
+    const calculateDensity = (t: number): number => {
+        const exactFailuresAtT = times.filter((time) => time <= t).length;
+        return exactFailuresAtT / (times.length * exactFailuresAtT || 1); // Zapobiega dzieleniu przez 0
     };
 
-    const calculateLambda = (t: number) => {
+    const calculateLambda = (t: number): number => {
         const R_t = calculateR(t);
         if (R_t === 0) return 0;
         return calculateDensity(t) / R_t;
     };
 
-    const calculateMeanTime = () => {
+    const calculateMeanTime = (): number => {
         if (times.length === 0) return 0;
         const total = times.reduce((acc, time) => acc + time, 0);
         return total / times.length;
@@ -59,11 +66,11 @@ export default function ReliabilityCalculator() {
             return;
         }
 
-        const results = {
+        const results: CalculatedResults = {
             F: calculateF(t).toFixed(3),
             R: calculateR(t).toFixed(3),
             f: calculateDensity(t).toFixed(3),
-            lambda: calculateLambda(t).toFixed(10)
+            lambda: calculateLambda(t).toFixed(10),
         };
         setCalculatedResults(results);
         setIsModalOpen(true);
@@ -179,7 +186,7 @@ export default function ReliabilityCalculator() {
                 </ul>
             </div>
 
-            {isModalOpen && (
+            {isModalOpen && calculatedResults && (
                 <div className="fixed z-10 inset-0 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 relative z-20">
                         <h2 className="text-2xl font-bold mb-4">Wyniki obliczeń</h2>
@@ -188,14 +195,12 @@ export default function ReliabilityCalculator() {
                         <p><b>f*(t)</b>: {calculatedResults.f}</p>
                         <p><b>λ*(t)</b>: {calculatedResults.lambda}</p>
                         <p><b>E*T</b>: {calculateMeanTime().toFixed(2)} godzin</p>
-
                         <button
                             onClick={exportToTextFile}
                             className="bg-green-500 text-white p-2 rounded-md mt-4 m-2"
                         >
                             Pobierz plik tekstowy
                         </button>
-
                         <button
                             onClick={closeModal}
                             className="mt-4 bg-blue-500 text-white p-2 rounded-md"
